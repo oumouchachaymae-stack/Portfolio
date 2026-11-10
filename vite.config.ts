@@ -1,11 +1,20 @@
-import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+const tailwindcssPackage = '@tailwindcss/vite';
+
+export default defineConfig(async () => {
+  let tailwindPlugin;
+  try {
+    const tailwindcss = await import(tailwindcssPackage);
+    tailwindPlugin = tailwindcss.default();
+  } catch {
+    // Continue without the Tailwind Vite plugin if it is not installed.
+  }
+
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), ...(tailwindPlugin ? [tailwindPlugin] : [])],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
